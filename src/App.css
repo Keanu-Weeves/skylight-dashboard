@@ -1,0 +1,48 @@
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: background 1s ease-in-out;
+}
+
+/*Header*/
+.dashboard-header {
+  height: 15%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/*Main Calendar*/
+.dashboard-main {
+  height: 55%;
+  display: flex;
+}
+
+/*Footer*/
+.dashboard-footer {
+  height: 30%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/*Glassmorphic tile for touchscreen read*/
+.widget-box {
+  background: rgba(18, 18, 20, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-container {
+  width: 100%;
+}
