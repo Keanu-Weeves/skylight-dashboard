@@ -1,48 +1,109 @@
+/* LIGHT THEME VARIABLES */
+:root {
+  --bg-main: #f8f9fa;
+  --bg-sidebar: #ffffff;
+  --text-dark: #333333;
+  --border-color: #e0e0e0;
+}
+
+/* APP SHELL */
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+}
+
+/* SIDEBAR NAVIGATION */
+.sidebar {
+  width: 100px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* MAIN AREA CONTAINER */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+/* HEADERS */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+
+.progress-trackers {
+  display: flex;
+  gap: 2rem;
+  height: 50px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+/* CALENDAR VIEW GRID */
+.calendar-view {
+  flex: 1;
+  display: flex;
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* FLOATING ACTION BUTTON */
+.fab-add {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #4a82a6;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 .app-container {
   width: 100vw;
   height: 100vh;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  transition: background 1s ease-in-out;
+  position: relative;
+  overflow: hidden; /* Prevents horizontal scrollbars during swipe */
+  background-color: #000; 
 }
 
-/*Header*/
-.dashboard-header {
-  height: 15%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
-/*Main Calendar*/
-.dashboard-main {
-  height: 55%;
-  display: flex;
-}
-
-/*Footer*/
-.dashboard-footer {
-  height: 30%;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1.25rem;
-}
-
-/*Glassmorphic tile for touchscreen read*/
-.widget-box {
-  background: rgba(18, 18, 20, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.calendar-container {
-  width: 100%;
+.screen-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* This ensures the touch gesture grabs the whole screen area */
+  touch-action: none; 
 }

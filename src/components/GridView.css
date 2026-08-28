@@ -1,0 +1,283 @@
+.grid-view-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 110px;
+  background-color: #fff;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.sidebar-logo {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #a0aab2;
+  margin-bottom: 2rem;
+}
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  width: 80%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn.active {
+  background-color: #f0f4f8;
+  color: #4a82a6;
+  font-weight: 600;
+}
+
+.back-btn {
+  margin-top: auto;
+  color: #dc2626;
+}
+
+/* MAIN CONTENT */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 2rem;
+  overflow: hidden;
+}
+
+/* HEADERS */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+
+.header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+.time, .weather {
+  font-size: 1.25rem;
+  font-weight: lighter;
+  color: #666;
+}
+
+.user-avatars {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* PROGRESS TRACKERS */
+.progress-trackers {
+  display: flex;
+  gap: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 1.5rem;
+}
+
+.tracker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tracker-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: 80px;
+}
+
+.tracker-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.tracker-score {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.progress-bar-bg {
+  flex: 1;
+  height: 6px;
+  background-color: #eaeaea;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* CALENDAR GRID */
+.calendar-view {
+  flex: 1;
+  display: flex;
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
+  position: relative;
+  overflow-y: auto;
+}
+
+.time-column {
+  width: 80px;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+}
+
+.time-slot {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.empty-corner {
+  height: 50px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.days-container {
+  flex: 1;
+  display: flex;
+}
+
+.day-column {
+  flex: 1;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-header {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.day-grid-lines {
+  flex: 1;
+  position: relative;
+  background-image: linear-gradient(to bottom, #eaeaea 1px, transparent 1px);
+  background-size: 100% 60px; /* Maps to the 60px time slot height */
+}
+
+/* EVENT BLOCKS */
+.event-block {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.event-time {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.event-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.event-badge {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.65rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* FAB */
+.fab-add {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #4a82a6;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(74, 130, 166, 0.4);
+  cursor: pointer;
+}
