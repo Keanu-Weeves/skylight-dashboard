@@ -9,7 +9,6 @@ export default function GlanceView() {
     return () => clearInterval(timer);
   }, []);
 
-  // Determine time-of-day for the 4K background image
   const getDayPeriod = () => {
     const hour = currentTime.getHours();
     if (hour >= 5 && hour < 12) return 'morning';
@@ -36,15 +35,12 @@ export default function GlanceView() {
   ];
 
   return (
-    // The background class updates automatically based on the time
     <div className={`glance-container bg-${getDayPeriod()}`}>
-      
-      {/* Overlay to ensure white text stays readable on bright 4K images */}
       <div className="dark-gradient-overlay" />
 
       <div className="glance-layout">
         
-        {/* TOP LEFT: Date, Time & Upcoming List */}
+        {/* TOP LEFT: Date, Time & Upcoming */}
         <div className="region-top-left">
           <h2 className="date-text">{formattedDate}</h2>
           <h1 className="time-text">{formattedTime}</h1>
@@ -62,9 +58,17 @@ export default function GlanceView() {
           </div>
         </div>
 
-        {/* TOP RIGHT: Current Weather & Forecast */}
+        {/* TOP RIGHT: Weather & Status */}
         <div className="region-top-right">
-          <h3 className="location-text">HOME, NY</h3>
+          
+          {/* System Status & Location */}
+          <div className="location-bar">
+            <div className="system-status">
+              <span className="cpu-dot"></span>
+              <span className="wifi-icon">📶</span>
+            </div>
+            <h3 className="location-text">HOME, NY</h3>
+          </div>
           <hr className="divider right-align" />
           
           <div className="current-weather">
@@ -94,12 +98,22 @@ export default function GlanceView() {
           <h1 className="greeting-text">Hey Bootiful</h1>
         </div>
 
-        {/* BOTTOM: News / Alert Ticker */}
+        {/* BOTTOM: Dots & Ticker */}
         <div className="region-bottom">
+          
+          {/* iOS Style Swipe Dots */}
+          <div className="pagination-dots">
+            <span className="dot"></span>
+            <span className="dot active"></span>
+            <span className="dot"></span>
+          </div>
+
           <div className="ticker-wrap">
             <div className="ticker-move">
               <span className="ticker-item"><strong>New York Times</strong> | World War 3 is here!</span>
-              <span className="ticker-item" style={{color: '#fca5a5'}}><strong>⚠️ FDA Alert</strong> | All food poisonous</span>
+              <span className="ticker-item warning-text">
+                <span className="pulse-icon">⚠️</span> <strong>FDA Alert</strong> | All food poisonous
+              </span>
             </div>
           </div>
         </div>

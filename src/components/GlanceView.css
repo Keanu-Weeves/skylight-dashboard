@@ -1,5 +1,3 @@
-@import url('https://googleapis.com');
-
 /* BACKGROUND LOGIC */
 .glance-container {
   width: 100vw;
@@ -11,13 +9,10 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-
 .bg-morning { background-image: url('/backgrounds/morning.jpg'); }
 .bg-afternoon { background-image: url('/backgrounds/afternoon.jpg'); }
 .bg-evening { background-image: url('/backgrounds/evening.jpg'); }
 .bg-night { background-image: url('/backgrounds/night.jpg'); }
-
-/* Fallback colors in case images don't load */
 .glance-container:not([class*="bg-"]) { background-color: #000; }
 
 .dark-gradient-overlay {
@@ -39,29 +34,33 @@
   grid-template-rows: auto 1fr auto;
 }
 
-/* All text gets a crisp drop shadow for visibility over photos */
 .glance-layout * {
   text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* TOP LEFT (Time & Events) */
+/* --- TOP LEFT (Time & Events) --- */
 .region-top-left {
   grid-column: 1;
   grid-row: 1;
 }
 
 .date-text {
-  font-size: 1.5rem;
-  font-weight: 100;
+  font-size: 1.3rem;
+  font-weight: 300;
+  opacity: 0.75; /* Knocked opacity back */
   margin-bottom: 0.25rem;
 }
 
 .time-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 6rem;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 5rem;
   font-weight: 100;
   line-height: 1;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.upcoming-list {
+  max-width: 320px; /* Closes the canyon gap */
 }
 
 .list-header {
@@ -73,7 +72,7 @@
 
 .divider {
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.3); /* Softer divider */
   width: 100%;
   margin-bottom: 1rem;
 }
@@ -90,27 +89,50 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
 .event-title { flex: 1; }
-.event-date { opacity: 0.8; font-size: 1rem; }
+.event-date { opacity: 0.8; font-size: 1rem; text-align: right; }
 
-/* TOP RIGHT (Weather) */
+/* --- TOP RIGHT (Weather & Status) --- */
 .region-top-right {
   grid-column: 3;
   grid-row: 1;
   text-align: right;
 }
 
-.right-align {
-  margin-left: auto;
+.right-align { margin-left: auto; }
+
+/* System Status Bar */
+.location-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.75;
+  font-size: 0.85rem;
+}
+
+.cpu-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #4ade80; /* Healthy green status */
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4ade80;
 }
 
 .location-text {
   font-size: 1rem;
   letter-spacing: 2px;
-  opacity: 0.8;
-  margin-bottom: 0.5rem;
+  opacity: 0.9;
 }
 
 .current-weather {
@@ -122,11 +144,7 @@
 }
 
 .weather-icon-large { font-size: 4rem; }
-
-.temp-block {
-  display: flex;
-  flex-direction: column;
-}
+.temp-block { display: flex; flex-direction: column; }
 
 .current-temp {
   font-size: 3.5rem;
@@ -137,6 +155,11 @@
 .feels-like {
   font-size: 1rem;
   opacity: 0.8;
+}
+
+.forecast-list {
+  max-width: 320px; /* Closes the canyon gap */
+  margin-left: auto;
 }
 
 .forecast-row {
@@ -151,7 +174,7 @@
 
 .forecast-day { text-align: left; }
 
-/* CENTER (Greeting) */
+/* --- CENTER (Greeting) --- */
 .region-center {
   grid-column: 1 / -1;
   grid-row: 2;
@@ -162,15 +185,39 @@
 
 .greeting-text {
   font-size: 4.5rem;
-  font-weight: 200;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 100; /* Ultra-light weight */
   letter-spacing: -1px;
 }
 
-/* BOTTOM (Ticker) */
+/* --- BOTTOM (Ticker & Swipe Dots) --- */
 .region-bottom {
   grid-column: 1 / -1;
   grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   overflow: hidden;
+}
+
+.pagination-dots {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 10px rgba(255,255,255,0.8);
+  transform: scale(1.1);
 }
 
 .ticker-wrap {
@@ -188,6 +235,22 @@
   font-size: 1.25rem;
   margin-right: 4rem;
   font-weight: 300;
+}
+
+.warning-text {
+  color: #ef4444; /* Alert Red */
+  font-weight: 400;
+}
+
+.pulse-icon {
+  display: inline-block;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes ticker {

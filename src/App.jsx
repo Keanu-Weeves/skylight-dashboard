@@ -2,51 +2,64 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlanceView from './components/GlanceView';
 import GridView from './components/GridView';
+import TaskView from './components/TaskView';
 import './App.css';
 
-export default function App() {
-  // State to track which screen is active
-  const [activeScreen, setActiveScreen] = useState('glance');
+// order of screens from left to right
+const screens = ['tasks', 'glance', 'grid'];
 
-  // Framer Motion animation variants for the slide effect
+export default function App() {
+  // start at index 1 
+  const [currentIndex, setCurrentIndex] = useState(1);
+  
+  // Track swipe direction (1 for swiping left/moving forward, -1 for swiping right/moving backward)
+  const [direction, setDirection] = useState(0);
+
+  // Framer Motion animation variants
   const slideVariants = {
-    enter: (direction) => ({
-      x: direction === 'right' ? 1000 : -1000,
+    enter: (dir) => ({
+      x: dir > 0 ? 1000 : -1000,
       opacity: 0,
     }),
     center: {
       x: 0,
       opacity: 1,
     },
-    exit: (direction) => ({
-      x: direction === 'right' ? -1000 : 1000,
+    exit: (dir) => ({
+      x: dir < 0 ? 1000 : -1000,
       opacity: 0,
     }),
   };
 
-  // Determine direction for the animation
-  const direction = activeScreen === 'grid' ? 'right' : 'left';
-
-  // The gesture handler: swipes switch screens
   const handleDragEnd = (e, { offset, velocity }) => {
-    const swipeThreshold = 10000;
+    // Determine how hard/far the user swiped
     const swipePower = Math.abs(offset.x) * velocity.x;
+    const swipeThreshold = 5000; // Adjust this if it feels too sensitive or too stiff
 
-    if (swipePower < -swipeThreshold && activeScreen === 'glance') {
-      // Swiped left
-      setActiveScreen('grid');
-    } else if (swipePower > swipeThreshold && activeScreen === 'grid') {
-      // Swiped right
-      setActiveScreen('glance');
+    if (swipePower < -swipeThreshold && currentIndex < screens.length - 1) {
+      // Swiped Left (Move to the next screen on the right)
+      setDirection(1);
+      setCurrentIndex((prev) => prev + 1);
+    } else if (swipePower > swipeThreshold && currentIndex > 0) {
+      // Swiped Right (Move to the previous screen on the left)
+      setDirection(-1);
+      setCurrentIndex((prev) => prev - 1);
     }
+  };
+
+  // Helper to render the correct component
+  const renderScreen = () => {
+    if (screens[currentIndex] === 'tasks') return <TaskView />;
+    if (screens[currentIndex] === 'glance') return <GlanceView />;
+    if (screens[currentIndex] === 'grid') return <GridView onBackSwipe={() => { setDirection(-1); setCurrentIndex(1); }} />;
   };
 
   return (
     <div className="app-container">
-      {/* AnimatePresence handles the unmounting/mounting transition */}
+      {/* custom={direction} tells Framer Motion which way to slide the animations */}
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
-          key={activeScreen}
+          key={currentIndex}
           custom={direction}
           variants={slideVariants}
           initial="enter"
@@ -59,11 +72,7 @@ export default function App() {
           onDragEnd={handleDragEnd}
           className="screen-wrapper"
         >
-          {activeScreen === 'glance' ? (
-            <GlanceView />
-          ) : (
-            <GridView onBackSwipe={() => setActiveScreen('glance')} />
-          )}
+          {renderScreen()}
         </motion.div>
       </AnimatePresence>
     </div>

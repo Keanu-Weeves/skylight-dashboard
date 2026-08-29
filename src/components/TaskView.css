@@ -1,0 +1,107 @@
+
+.task-view-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f8f9fa !important; /* Forces the light background */
+  color: #333 !important; /* Forces dark text */
+  position: relative;
+}
+
+/* SIDEBAR (Mirrors GridView) */
+.sidebar {
+  width: 110px;
+  background-color: #fff !important; 
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  z-index: 2;
+}
+
+/* MAIN CONTENT */
+.main-area {
+  flex: 1;
+  background-color: #f8f9fa; /* Plugs the transparency hole */
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* GROCERY TAB STYLES */
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.grocery-layout {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 3rem;
+}
+
+.grocery-categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.category-title {
+  margin-bottom: 1rem;
+  color: #555;
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 0.5rem;
+}
+
+.checked-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.grocery-qr-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-box {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.qr-placeholder {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 1rem;
+  background: #f0f4f8;
+  border: 2px dashed #cbd5e1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: #94a3b8;
+}
