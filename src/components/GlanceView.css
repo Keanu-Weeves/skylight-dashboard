@@ -9,10 +9,10 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-.bg-morning { background-image: url('/backgrounds/morning.jpg'); }
-.bg-afternoon { background-image: url('/backgrounds/afternoon.jpg'); }
-.bg-evening { background-image: url('/backgrounds/evening.jpg'); }
-.bg-night { background-image: url('/backgrounds/night.jpg'); }
+.bg-morning { background-image: url('/backgrounds/morningBackground.jpg'); }
+.bg-afternoon { background-image: url('/backgrounds/fallBackground.jpg'); }
+.bg-evening { background-image: url('/backgrounds/sunsetBackground.jpg'); }
+.bg-night { background-image: url('/backgrounds/realVelarisv2.jpg'); }
 .glance-container:not([class*="bg-"]) { background-color: #000; }
 
 .dark-gradient-overlay {
