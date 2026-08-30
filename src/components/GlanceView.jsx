@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './GlanceView.css';
 
-export default function GlanceView() {
-  const [currentTime, setCurrentTime] = useState(new Date());
+export default function GlanceView({ currentTime, weatherData, activeLocation }) {
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const getDayPeriod = () => {
     const hour = currentTime.getHours();

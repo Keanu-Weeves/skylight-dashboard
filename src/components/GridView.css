@@ -89,7 +89,6 @@
 
 .time, .weather {
   font-size: 1.25rem;
-  font-weight: lighter;
   color: #666;
 }
 
@@ -280,4 +279,229 @@
   border: none;
   box-shadow: 0 4px 12px rgba(74, 130, 166, 0.4);
   cursor: pointer;
+}
+
+.avatar-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.1s;
+}
+
+.avatar-btn:active { transform: scale(0.95); }
+
+/* MODAL STYLES */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.color-swatch {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-close {
+  background: #f0f4f8;
+  color: #333;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* CALENDAR CONTROLS */
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.control-btn {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
+  color: #4a82a6;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.control-btn:active { background: #f0f4f8; }
+
+.btn-today {
+  width: auto;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-left: auto; /* Pushes the 'Today' button to the far right */
+}
+
+.current-month-display {
+  font-size: 1.5rem;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: center;
+}
+
+/* FULL MONTH VIEW */
+.month-grid-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #eaeaea;
+  overflow: hidden;
+}
+
+.month-header-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #f8f9fa;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.month-header-cell {
+  padding: 0.75rem 0;
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+  border-right: 1px solid #eaeaea;
+}
+.month-header-cell:last-child { border-right: none; }
+
+.month-grid-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(100px, 1fr); /* Ensures rows stretch to fill height */
+}
+
+.month-day {
+  border-right: 1px solid #eaeaea;
+  border-bottom: 1px solid #eaeaea;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.month-day.empty {
+  background: #fafafa;
+}
+
+.day-number {
+  align-self: flex-end;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.month-day.is-today .day-number {
+  background: #4a82a6;
+  color: white;
+}
+
+/* DYNAMIC EVENT PILLS */
+.day-events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.5rem;
+  overflow-y: auto;
+  flex: 1; /* Pushes them up under the date number */
+}
+
+/* Hide scrollbar for a cleaner look */
+.day-events-container::-webkit-scrollbar {
+  display: none;
+}
+
+.calendar-event-pill {
+  background-color: #e2f4f2;
+  border-left: 3px solid #5eb3a6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: #2c524c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.calendar-event-pill:hover {
+  filter: brightness(0.95);
+}
+
+.event-time {
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.event-summary {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

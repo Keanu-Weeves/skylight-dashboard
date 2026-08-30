@@ -40,8 +40,8 @@ export default function TaskView() {
             </div>
             <div className="meal-grid">
               <div className="meal-card">🌮 Family Taco Night</div>
-              <div className="meal-card">🥗 Grilled Chicken Salad</div>
-              <div className="meal-card">🍝 Spaghetti Bolognese</div>
+              <div className="meal-card">🥗 Caesar Salad</div>
+              <div className="meal-card">🍝 Spaghetti</div>
             </div>
           </div>
         );

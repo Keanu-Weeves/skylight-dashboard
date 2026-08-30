@@ -1,14 +1,127 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './GridView.css';
 
-export default function GridView({ onBackSwipe }) {
-  // Using the family members from your GlanceView!
-  const users = [
-    { initial: 'D', name: 'Dad', color: '#5eb3a6', score: '2/5' },
-    { initial: 'M', name: 'Mom', color: '#e58e82', score: '5/5' },
-    { initial: 'R', name: 'Rosie', color: '#a78bfa', score: '3/4' },
-    { initial: 'L', name: 'Lily', color: '#86efac', score: '1/3' },
-  ];
+export default function GridView({ currentTime, weatherData, onBackSwipe }) {
+  // --- STATE ---
+  const [activeView, setActiveView] = useState('week'); // 'week' or 'month'
+  const [viewDate, setViewDate] = useState(new Date()); // Controls the calendar navigation
+  
+  // Centralized user state (eventually move this to Redux/Context)
+  const [users, setUsers] = useState([
+    { id: 1, initial: 'D', name: 'Dad', color: '#5eb3a6' },
+    { id: 2, initial: 'M', name: 'Mom', color: '#e58e82' },
+    { id: 3, initial: 'R', name: 'Rosie', color: '#a78bfa' },
+    { id: 4, initial: 'L', name: 'Lily', color: '#86efac' },
+  ]);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const formattedTime = currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+  // Pre-defined color palette for the modal
+  const colorPalette = ['#5eb3a6', '#e58e82', '#a78bfa', '#86efac', '#fbbf24', '#60a5fa', '#f472b6', '#94a3b8'];
+  const [calendarEvents, setCalendarEvents] = useState({});
+
+  useEffect(() => {
+    const fetchCalendar = async () => {
+      try {
+        const response = await fetch('/api/calendar');
+        const data = await response.json();
+        console.log("Raw Calendar Data:", data);
+        setCalendarEvents(data);
+      } catch (error) {
+        console.error("Failed to fetch calendar:", error);
+      }
+    }
+
+    fetchCalendar();
+  }, []);
+
+  const handleAvatarClick = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  // --- RE-ADDED FUNCTION: Handles updating the specific user's color ---
+  const handleColorChange = (newColor) => {
+    setUsers(users.map(u => u.id === selectedUser.id ? { ...u, color: newColor } : u));
+    setIsModalOpen(false);
+  };
+
+  // --- TIME TRAVEL LOGIC ---
+  const handlePrev = () => {
+    const newDate = new Date(viewDate);
+    if (activeView === 'week') newDate.setDate(newDate.getDate() - 7);
+    else newDate.setMonth(newDate.getMonth() - 1);
+    setViewDate(newDate);
+  };
+
+  const handleNext = () => {
+    const newDate = new Date(viewDate);
+    if (activeView === 'week') newDate.setDate(newDate.getDate() + 7);
+    else newDate.setMonth(newDate.getMonth() + 1);
+    setViewDate(newDate);
+  };
+
+  const handleToday = () => setViewDate(new Date());
+
+  // Formatting the Header (e.g., "August 2026")
+  const monthYearDisplay = viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // --- PARSE THE RAW ICAL DATA ---
+  // Convert the object into a flat array of valid events
+  const parsedEvents = Object.values(calendarEvents).filter(
+    (item) => item.type === 'VEVENT'
+  );
+
+  // --- MONTH GRID GENERATOR ---
+  const generateMonthGrid = () => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(); // Day of week (0-6)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    const days = [];
+    
+    // Pad empty slots before the 1st of the month
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="month-day empty"></div>);
+    }
+    
+    // Fill the actual days
+    for (let i = 1; i <= daysInMonth; i++) {
+      const currentCellDate = new Date(year, month, i);
+      const isToday = new Date().toDateString() === currentCellDate.toDateString();
+      
+      // Find all events that happen on this specific day
+      const dayEvents = parsedEvents.filter((event) => {
+        if (!event.start) return false;
+        const eventDate = new Date(event.start);
+        return eventDate.toDateString() === currentCellDate.toDateString();
+      });
+
+      days.push(
+        <div key={i} className={`month-day ${isToday ? 'is-today' : ''}`}>
+          <span className="day-number">{i}</span>
+          
+          {/* Render the matching events for this day */}
+          <div className="day-events-container">
+            {dayEvents.map((evt, idx) => (
+              <div key={idx} className="calendar-event-pill">
+                <span className="event-time">
+                  {new Date(evt.start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                </span>
+                <span className="event-summary">{evt.summary}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return days;
+  };
 
   return (
     <div className="grid-view-container">
@@ -17,108 +130,102 @@ export default function GridView({ onBackSwipe }) {
       <nav className="sidebar">
         <div className="sidebar-logo">F</div>
         <div className="nav-items">
-          <button className="nav-btn active">📅 Calendar</button>
-          <button className="nav-btn">🧹 Chores</button>
-          <button className="nav-btn">⭐ Rewards</button>
-          <button className="nav-btn">🍽️ Meals</button>
+          <button 
+            className={`nav-btn ${activeView === 'week' ? 'active' : ''}`}
+            onClick={() => setActiveView('week')}
+          >
+            📅 Week
+          </button>
+          <button 
+            className={`nav-btn ${activeView === 'month' ? 'active' : ''}`}
+            onClick={() => setActiveView('month')}
+          >
+            🗓️ Month
+          </button>
         </div>
-        {/* A manual back button just in case touch drag isn't active on your PC yet */}
-        <button className="nav-btn back-btn" onClick={onBackSwipe}>
-          ← Back
-        </button>
+        <button className="nav-btn back-btn" onClick={onBackSwipe}>← Back</button>
       </nav>
 
-      {/* RIGHT MAIN CONTENT AREA */}
       <div className="main-area">
-        
         {/* TOP HEADER */}
         <header className="top-header">
           <div className="header-left">
             <h1>Family Hub</h1>
-            <span className="time">5:25 PM</span>
-            <span className="weather">☀️ 72°</span>
+            <span className="time">{formattedTime}</span>
+            <span className="weather">{weatherData.condition} {weatherData.temp}</span>
           </div>
           
           <div className="header-right">
             <div className="user-avatars">
               {users.map((user) => (
-                <span 
-                  key={user.name} 
-                  className="avatar" 
+                <button 
+                  key={user.id} 
+                  className="avatar-btn" 
                   style={{ backgroundColor: user.color }}
+                  onClick={() => handleAvatarClick(user)}
                 >
                   {user.initial}
-                </span>
+                </button>
               ))}
             </div>
           </div>
         </header>
 
-        {/* PROGRESS BARS */}
-        <div className="progress-trackers">
-          {users.map((user) => (
-            <div key={user.name} className="tracker">
-              <span className="tracker-name" style={{ color: user.color }}>
-                <span className="tracker-dot" style={{ backgroundColor: user.color }}>
-                  {user.initial}
-                </span>
-                {user.name}
-              </span>
-              <span className="tracker-score">{user.score}</span>
-              <div className="progress-bar-bg">
-                <div 
-                  className="progress-bar-fill" 
-                  style={{ 
-                    backgroundColor: user.color, 
-                    width: `${(parseInt(user.score.split('/')[0]) / parseInt(user.score.split('/')[1])) * 100}%` 
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+        {/* CALENDAR NAVIGATION BAR */}
+        <div className="calendar-controls">
+          <button className="control-btn" onClick={handlePrev}>&lt;</button>
+          <h2 className="current-month-display">{monthYearDisplay}</h2>
+          <button className="control-btn" onClick={handleNext}>&gt;</button>
+          <button className="control-btn btn-today" onClick={handleToday}>Today</button>
         </div>
 
-        {/* TIME-BLOCKED CALENDAR GRID */}
+        {/* DYNAMIC CALENDAR AREA */}
         <main className="calendar-view">
-          
-          {/* Time Column */}
-          <div className="time-column">
-            <div className="time-slot empty-corner"></div>
-            {['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM'].map(time => (
-              <div key={time} className="time-slot">{time}</div>
-            ))}
-          </div>
-
-          {/* Day Columns (Mon - Fri) */}
-          <div className="days-container">
-            {['Mon 3', 'Tue 4', 'Wed 5', 'Thu 6', 'Fri 7'].map(day => (
-              <div key={day} className="day-column">
-                <div className="day-header">{day}</div>
-                <div className="day-grid-lines">
-                  {/* Mock Event Block */}
-                  {day === 'Tue 4' && (
-                    <div className="event-block" style={{ top: '60px', height: '110px', backgroundColor: '#e2f4f2', borderLeft: '4px solid #5eb3a6' }}>
-                      <span className="event-time">10:00 - 11:30 AM</span>
-                      <span className="event-title">Workout</span>
-                      <span className="event-badge" style={{ backgroundColor: '#5eb3a6' }}>D</span>
-                    </div>
-                  )}
-                  {day === 'Thu 6' && (
-                    <div className="event-block" style={{ top: '180px', height: '180px', backgroundColor: '#fdf2f0', borderLeft: '4px solid #e58e82' }}>
-                      <span className="event-time">12:00 - 3:00 PM</span>
-                      <span className="event-title">Daily crashout</span>
-                      <span className="event-badge" style={{ backgroundColor: '#e58e82' }}>M</span>
-                    </div>
-                  )}
-                </div>
+          {activeView === 'month' ? (
+            
+            /* --- FULL MONTH VIEW --- */
+            <div className="month-grid-container">
+              <div className="month-header-row">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                  <div key={d} className="month-header-cell">{d}</div>
+                ))}
               </div>
-            ))}
-          </div>
+              <div className="month-grid-body">
+                {generateMonthGrid()}
+              </div>
+            </div>
 
-          {/* Floating Action Button */}
-          <button className="fab-add">+</button>
+          ) : (
+            
+            /* --- WEEK VIEW (Placeholder for now) --- */
+            <div className="week-grid-container" style={{padding: '2rem'}}>
+              <h3>Week of {viewDate.toLocaleDateString()}</h3>
+              <p style={{color: '#888'}}>Time-blocked grid goes here...</p>
+            </div>
+
+          )}
         </main>
       </div>
+
+      {/* COLOR MODAL */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Customize {selectedUser?.name}'s Color</h3>
+            <div className="color-grid">
+              {colorPalette.map(color => (
+                <button 
+                  key={color} 
+                  className="color-swatch"
+                  style={{ backgroundColor: color }}
+                  onClick={() => handleColorChange(color)}
+                />
+              ))}
+            </div>
+            <button className="btn-close" onClick={() => setIsModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
