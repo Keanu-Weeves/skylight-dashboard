@@ -15,6 +15,15 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
   const formattedTime = currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   const formattedDate = currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
+  const videoMap = {
+    morning: '/backgrounds/morning-loop.mp4',
+    afternoon: '/backgrounds/afternoon-loop.mp4',
+    evening: '/backgrounds/evening-loop.mp4',
+    night: '/backgrounds/night-loop.mp4'
+  };
+
+  const currentVideo = videoMap[getDayPeriod()];
+
   // Mock Data
   const upcomingEvents = [
     { title: "UoPeople", date: "Today", userColor: "#5eb3a6" },
@@ -30,7 +39,17 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
   ];
 
   return (
-    <div className={`glance-container bg-${getDayPeriod()}`}>
+    <div className="glance-container">
+      <video
+      key={currentVideo}
+      className="background-video"
+      autoPlay
+      loop
+      muted
+      playsInline
+      >
+        <source src={currentVideo} type="video/mp4" />
+      </video>
       <div className="dark-gradient-overlay" />
 
       <div className="glance-layout">

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
 .grid-view-container {
   display: flex;
   width: 100vw;
@@ -18,10 +20,23 @@
 }
 
 .sidebar-logo {
-  font-size: 2rem;
-  font-weight: 300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #a0aab2;
+  transition: color 0.3s ease;
   margin-bottom: 2rem;
+}
+
+.sidebar-logo:hover {
+  color: #5eb3a6;
+}
+
+.calligraphy-e {
+  font-family: 'Great Vibes', cursive;
+  font-size: 85px;
+  fill: currentColor;
+  user-select: none;
 }
 
 .nav-items {
@@ -504,4 +519,211 @@
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* TIME GRID LAYOUT (WEEK & DAY) - BULLETPROOFED */
+.time-grid-scroll-wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eaeaea;
+  align-items: flex-start; /* CRITICAL: Prevents the grid from flex-squishing to fit the screen */
+}
+
+.time-column {
+  width: 70px;
+  border-right: 1px solid #eaeaea;
+  flex-shrink: 0;
+  background: #fafafa;
+  min-height: 1440px; /* 24 hours * 60px */
+  z-index: 10; 
+}
+
+.time-header-spacer {
+  height: 50px; 
+  border-bottom: 1px solid #eaeaea;
+}
+
+.hour-slot {
+  height: 60px;
+  min-height: 60px;
+  box-sizing: border-box; /* Prevents 1px borders from causing mathematical drift */
+  flex-shrink: 0;
+  padding-right: 0.5rem;
+  text-align: right;
+  font-size: 0.75rem;
+  color: #888;
+  border-bottom: 1px solid transparent;
+  transform: translateY(-0.5rem);
+}
+
+.days-columns-container {
+  display: flex;
+  flex: 1;
+  min-height: 1440px;
+}
+
+.day-column {
+  flex: 1;
+  border-right: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-column-header {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 1px solid #eaeaea;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.day-column-grid {
+  position: relative !important; /* CRITICAL: Traps the absolutely positioned events */
+  flex: 1;
+  height: 1440px;
+  min-height: 1440px; /* Locks the exact pixel math */
+  flex-shrink: 0;
+}
+
+.single-day {
+  margin-top: 0; /* Aligns the Day view perfectly with the left column */
+}
+
+.grid-cell-line {
+  height: 60px;
+  min-height: 60px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* ABSOLUTELY POSITIONED EVENTS */
+.time-blocked-event {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  overflow: hidden;
+  z-index: 5;
+}
+
+.event-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.event-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.event-meta span {
+  font-size: 0.7rem;
+  color: #555;
+}
+
+.event-avatar {
+  font-size: 1rem !important;
+}
+
+/* ADD EVENT MODAL */
+.fab-add {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #4a82a6;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(74, 130, 166, 0.4);
+  cursor: pointer;
+  z-index: 20;
+}
+
+.add-event-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.add-event-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.avatar-choice {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.avatar-choice.selected {
+  opacity: 1;
+  box-shadow: 0 0 0 3px #333;
+  transform: scale(1.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  background-color: #4a82a6;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
