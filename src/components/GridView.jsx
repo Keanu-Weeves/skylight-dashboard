@@ -3,10 +3,9 @@ import './GridView.css';
 
 export default function GridView({ currentTime, weatherData, onBackSwipe }) {
   // --- STATE ---
-  const [activeView, setActiveView] = useState('week'); // 'day', 'week', 'month'
+  const [activeView, setActiveView] = useState('week'); 
   const [viewDate, setViewDate] = useState(new Date()); 
   
-  // Users now have avatars!
   const [users, setUsers] = useState([
     { id: 1, initial: 'D', name: 'Dad', color: '#5eb3a6', avatar: '👨' },
     { id: 2, initial: 'M', name: 'Mom', color: '#e58e82', avatar: '👩' },
@@ -14,9 +13,8 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
     { id: 4, initial: 'L', name: 'Lily', color: '#86efac', avatar: '👶' },
   ]);
 
-  // Data States
   const [calendarEvents, setCalendarEvents] = useState({});
-  const [localEvents, setLocalEvents] = useState([]); // User-added events
+  const [localEvents, setLocalEvents] = useState([]); 
 
   // Modal States
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
@@ -25,11 +23,13 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: '', date: '', start: '09:00', end: '10:00', userId: 1 });
 
+  // NEW: State for viewing/editing an existing event
+  const [eventToEdit, setEventToEdit] = useState(null);
+
   const formattedTime = currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   const colorPalette = ['#5eb3a6', '#e58e82', '#a78bfa', '#86efac', '#fbbf24', '#60a5fa', '#f472b6', '#94a3b8'];
-  const HOURS = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
+  const HOURS = Array.from({ length: 24 }, (_, i) => i); 
 
-  // Fetch Google Calendar
   useEffect(() => {
     const fetchCalendar = async () => {
       try {
@@ -43,8 +43,6 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
     fetchCalendar();
   }, []);
 
-  // --- DATA MERGING ---
-  // Combine Google events and Local custom events into one flat array
   const allEvents = [
     ...Object.values(calendarEvents)
       .filter((item) => item.type === 'VEVENT')
@@ -70,7 +68,7 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
     const endStr = `${newEvent.date}T${newEvent.end}:00`;
     
     const createdEvent = {
-      id: Date.now(),
+      id: Date.now().toString(),
       title: newEvent.title,
       start: new Date(startStr),
       end: new Date(endStr),
@@ -80,7 +78,18 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
 
     setLocalEvents([...localEvents, createdEvent]);
     setIsAddEventOpen(false);
-    setNewEvent({ title: '', date: '', start: '09:00', end: '10:00', userId: 1 }); // Reset
+    setNewEvent({ title: '', date: '', start: '09:00', end: '10:00', userId: 1 }); 
+  };
+
+  const handleDeleteEvent = () => {
+    if (!eventToEdit) return;
+    
+    if (eventToEdit.isGoogle) {
+      alert("This is a Google Calendar event. We need the API upgrade to delete this from the server!");
+    } else {
+      setLocalEvents(localEvents.filter(e => e.id !== eventToEdit.id));
+    }
+    setEventToEdit(null);
   };
 
   // --- TIME TRAVEL LOGIC ---
@@ -102,7 +111,7 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
 
   const handleToday = () => {
     setViewDate(new Date());
-    setActiveView('day'); // Force switch to day view when checking today
+    setActiveView('day'); 
   };
 
   const headerDisplay = activeView === 'month' 
@@ -112,8 +121,6 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
       : viewDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
   // --- RENDER HELPERS ---
-  
-  // 1. Month View Generator
   const generateMonthGrid = () => {
     const year = viewDate.getFullYear();
     const month = viewDate.getMonth();
@@ -122,17 +129,14 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
     
     const days = [];
     
-    // Pad empty slots before the 1st of the month
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="month-day empty"></div>);
     }
     
-    // Fill the actual days
     for (let i = 1; i <= daysInMonth; i++) {
       const currentCellDate = new Date(year, month, i);
       const isToday = new Date().toDateString() === currentCellDate.toDateString();
       
-      // Filter the MERGED allEvents array for this day
       const dayEvents = allEvents.filter((event) => {
         if (!event.start) return false;
         return event.start.toDateString() === currentCellDate.toDateString();
@@ -144,15 +148,15 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
           
           <div className="day-events-container">
             {dayEvents.map((evt, idx) => {
-              // Find the user to apply their color to the month view pill
               const user = users.find(u => u.id === evt.userId);
-              const pillColor = user ? user.color : '#5eb3a6'; // Fallback for Google events
+              const pillColor = user ? user.color : '#5eb3a6'; 
 
               return (
                 <div 
                   key={idx} 
                   className="calendar-event-pill"
                   style={{ borderLeftColor: pillColor, backgroundColor: `${pillColor}22` }}
+                  onClick={() => setEventToEdit(evt)} /* NEW: Opens the modal */
                 >
                   <span className="event-time">
                     {evt.start.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
@@ -168,7 +172,6 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
     return days;
   };
 
-  // 2. Day/Week View Generator
   const renderTimeBlockedEvents = (targetDate) => {
     const dayEvents = allEvents.filter(e => e.start.toDateString() === targetDate.toDateString());
     
@@ -189,8 +192,10 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
             top: `${topPos}px`, 
             height: `${height}px`, 
             backgroundColor: `${bgColor}33`, 
-            borderLeft: `4px solid ${borderColor}`
+            borderLeft: `4px solid ${borderColor}`,
+            cursor: 'pointer' /* Added pointer for UI feedback */
           }}
+          onClick={() => setEventToEdit(event)} /* NEW: Opens the modal */
         >
           <span className="event-title">{event.title}</span>
           <div className="event-meta">
@@ -219,18 +224,11 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
       <nav className="sidebar">
         <div className="sidebar-logo">
           <svg viewBox="0 0 100 100" width="55" height="55" xmlns="http://www.w3.org/2000/svg">
-            {/* The y-offset is slightly lower than 50 because cursive fonts have sweeping ascenders */}
-            <text 
-              x="50" 
-              y="55" 
-              className="calligraphy-e"
-              textAnchor="middle" 
-              dominantBaseline="middle"
-            >
+            <text x="50" y="55" className="calligraphy-e" textAnchor="middle" dominantBaseline="middle">
               E
             </text>
           </svg>
-          </div>        
+        </div>
         <div className="nav-items">
           <button className={`nav-btn ${activeView === 'day' ? 'active' : ''}`} onClick={() => setActiveView('day')}>
             ⏱️ Day
@@ -332,12 +330,13 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
             </div>
           )}
           
-          {/* FLOATING ADD BUTTON */}
           <button className="fab-add" onClick={() => setIsAddEventOpen(true)}>+</button>
         </main>
       </div>
 
-      {/* COLOR MODAL */}
+      {/* --- MODALS --- */}
+      
+      {/* 1. COLOR MODAL */}
       {isColorModalOpen && (
         <div className="modal-overlay" onClick={() => setIsColorModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -357,7 +356,7 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
         </div>
       )}
 
-      {/* ADD EVENT MODAL */}
+      {/* 2. ADD EVENT MODAL */}
       {isAddEventOpen && (
         <div className="modal-overlay" onClick={() => setIsAddEventOpen(false)}>
           <div className="modal-content add-event-form" onClick={(e) => e.stopPropagation()}>
@@ -404,6 +403,31 @@ export default function GridView({ currentTime, weatherData, onBackSwipe }) {
                 <button type="submit" className="btn-primary">Save Event</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 3. EVENT DETAILS / EDIT MODAL */}
+      {eventToEdit && (
+        <div className="modal-overlay" onClick={() => setEventToEdit(null)}>
+          <div className="modal-content event-details-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="details-title">{eventToEdit.title}</h3>
+            
+            <div className="details-time">
+              <strong>Date:</strong> {eventToEdit.start.toLocaleDateString()} <br/>
+              <strong>Time:</strong> {eventToEdit.start.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} - {eventToEdit.end.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+            </div>
+
+            {eventToEdit.isGoogle && (
+              <p className="google-warning">
+                🗓️ <em>This is a Google Calendar event. Two-way sync setup is required to save changes.</em>
+              </p>
+            )}
+
+            <div className="modal-actions">
+              <button className="btn-danger" onClick={handleDeleteEvent}>Delete Event</button>
+              <button className="btn-close" onClick={() => setEventToEdit(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}

@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlanceView from './components/GlanceView';
 import GridView from './components/GridView';
 import TaskView from './components/TaskView';
 import './App.css';
 
+
+const handleGoogleLogin = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+
+  if (error) console.error('Google login error:', error.message);
+};
 const screens = ['tasks', 'glance', 'grid'];
 
 export default function App() {
@@ -60,6 +75,11 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <button 
+      onClick={handleGoogleLogin} 
+      style={{ padding: '1rem', background: '#4a82a6', color: 'white', zIndex: 9999, position: 'absolute' }}>
+        Login with Google
+        </button>
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
