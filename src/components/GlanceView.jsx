@@ -16,10 +16,10 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
   const formattedDate = currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
   const videoMap = {
-    morning: '/backgrounds/morning-loop.mp4',
-    afternoon: '/backgrounds/afternoon-loop.mp4',
-    evening: '/backgrounds/evening-loop.mp4',
-    night: '/backgrounds/night-loop.mp4'
+    morning: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/morning-loop.mp4',
+    afternoon: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/afternoon-loop.mp4',
+    evening: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/evening-loop.mp4',
+    night: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/night-loop.mp4'
   };
 
   const currentVideo = videoMap[getDayPeriod()];
