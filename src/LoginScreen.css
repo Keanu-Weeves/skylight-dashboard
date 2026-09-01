@@ -1,0 +1,126 @@
+.login-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.login-background-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  z-index: 0;
+}
+
+.login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Darkens the video slightly so text is readable */
+  z-index: 1;
+}
+
+.login-glass-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 4rem 3rem;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: fadeUpIn 0.8s ease-out forwards;
+}
+
+.brand-header {
+  margin-bottom: 3rem;
+}
+
+.brand-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -1px;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffb347 45%,
+    #ff7b00 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hearthGlow 3s ease-in-out infinite alternate;
+}
+
+.brand-subtitle {
+  font-size: 1.1rem;
+  line-height: 3rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.google-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  background-color: #ffffff;
+  color: #3c4043;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.google-auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+}
+
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hearthGlow {
+    0% {
+        background-position: 0% 0%;
+        filter: drop-shadow(0px 0px 4px rgba(255, 179, 71, 0.2));
+    }
+    100% {
+        background-position: 0% 100%;
+        filter: drop-shadow(0px 0px 12px rgba(255, 123, 0, 0.6));
+    }
+}

@@ -1,42 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoginScreen from './LoginScreen';
+import SettingsModal from './components/SettingsModal';
 import GlanceView from './components/GlanceView';
 import GridView from './components/GridView';
 import TaskView from './components/TaskView';
 import './App.css';
 
-
-const handleGoogleLogin = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-      },
-    },
-  });
-
-  if (error) console.error('Google login error:', error.message);
-};
 const screens = ['tasks', 'glance', 'grid'];
 
 export default function App() {
+  // --- AUTHENTICATION & HUB STATE ---
+  const [session, setSession] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const [hasHubSetup, setHasHubSetup] = useState(false);
+  const [hubData, setHubData] = useState(null);
+
+  // --- DASHBOARD NAVIGATION STATE ---
   const [currentIndex, setCurrentIndex] = useState(1);
   const [direction, setDirection] = useState(0);
 
   // --- GLOBAL SHARED STATE ---
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeLocation, setActiveLocation] = useState('HOME, NY');
   const [weatherData, setWeatherData] = useState({ temp: '72°', condition: '☀️', feelsLike: '74°' });
 
-  // The single source of truth for the clock
+  // Auth & Database Listener
+  useEffect(() => {
+    const checkHub = async (userId) => {
+      // Fetch the user's specific hub settings
+      const { data } = await supabase.from('hubs').select('*').eq('owner_id', userId).single();
+      
+      if (data) {
+        setHasHubSetup(true);
+        setHubData(data);
+      } else {
+        setHasHubSetup(false);
+      }
+      setLoadingAuth(false);
+    };
+
+    // Check on initial load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) checkHub(session.user.id);
+      else setLoadingAuth(false);
+    });
+
+    // Listen for sign-ins / sign-outs
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) checkHub(session.user.id);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Source of truth for the clock
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // --- SWIPE ANIMATION LOGIC ---
   const slideVariants = {
     enter: (dir) => ({ x: dir > 0 ? 1000 : -1000, opacity: 0 }),
     center: { x: 0, opacity: 1 },
@@ -61,7 +87,8 @@ export default function App() {
       <GlanceView 
         currentTime={currentTime} 
         weatherData={weatherData} 
-        activeLocation={activeLocation} 
+        // pull specific location from Supabase
+        activeLocation={hubData ? hubData.weather_location : 'Dawsonville, GA'} 
       />
     );
     if (screens[currentIndex] === 'grid') return (
@@ -73,13 +100,57 @@ export default function App() {
     );
   };
 
+  // --- APP ROUTER ---
+
+  // Checking keys on initial load
+  if (loadingAuth) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000', color: '#fff' }}>
+        Igniting HearthOS...
+      </div>
+    );
+  }
+
+  // Not logged in -> Show the brand Lock Screen
+  if (!session) {
+    return <LoginScreen />;
+  }
+
+  // Logged in, but needs to set up Hub
+  if (session && !hasHubSetup) {
+    return (
+      <SettingsModal 
+        session={session} 
+        isOnboarding={true} 
+        // Once they save, trigger a re-fetch
+        onComplete={() => setHasHubSetup(true)} 
+      />
+    );
+  }
+
+  // Logged in & Hub Setup, Render the swipeable hub
   return (
     <div className="app-container">
-      <button 
-      onClick={handleGoogleLogin} 
-      style={{ padding: '1rem', background: '#4a82a6', color: 'white', zIndex: 9999, position: 'absolute' }}>
-        Login with Google
-        </button>
+      {/* Temporary Logout Button */}
+      <button
+        onClick={() => supabase.auth.signOut()}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 9999,
+          padding: '10px 20px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          color: '#fff',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '12px',
+          cursor: 'pointer',
+        }}
+      >
+        Sign Out
+      </button>
+
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentIndex}
