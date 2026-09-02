@@ -155,17 +155,19 @@ export default function GridView({ currentTime, weatherData, onBackSwipe, hubDat
           <svg viewBox="0 0 100 100" width="55" height="55" xmlns="http://www.w3.org/2000/svg">
             <text x="50" y="55" className="calligraphy-e" textAnchor="middle" dominantBaseline="middle">{familyInitial}</text>
           </svg>
+          <img className="brand-logo" src='public\logo.svg' alt="HearthOS Logo" />
         </div>
         <div className="nav-items">
-          <button className={`nav-btn ${activeView === 'day' ? 'active' : ''}`} onClick={() => setActiveView('day')}>⏱️ Day</button>
-          <button className={`nav-btn ${activeView === 'week' ? 'active' : ''}`} onClick={() => setActiveView('week')}>📅 Week</button>
-          <button className={`nav-btn ${activeView === 'month' ? 'active' : ''}`} onClick={() => setActiveView('month')}>🗓️ Month</button>
+          <button className={`nav-btn ${activeView === 'day' ? 'active' : ''}`} onClick={() => setActiveView('day')}>Day</button>
+          <button className={`nav-btn ${activeView === 'week' ? 'active' : ''}`} onClick={() => setActiveView('week')}>Week</button>
+          <button className={`nav-btn ${activeView === 'month' ? 'active' : ''}`} onClick={() => setActiveView('month')}>Month</button>
         </div>
         <button className="nav-btn back-btn" onClick={onBackSwipe}>← Back</button>
       </nav>
 
       <div className="main-area">
         <header className="top-header">
+
           <div className="header-left">
             <h1>HearthOS</h1>
             <span className="time">{formattedTime}</span>
@@ -203,21 +205,45 @@ export default function GridView({ currentTime, weatherData, onBackSwipe, hubDat
             </div>
           )}
           {activeView === 'week' && (
-            <div className="time-grid-scroll-wrapper">
-              <div className="time-column">
+            <div className="week-view-wrapper">
+              <div className="week-header-row">
                 <div className="time-header-spacer"></div>
-                {HOURS.map(h => (<div key={h} className="hour-slot">{h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`}</div>))}
-              </div>
-              <div className="days-columns-container">
-                {getWeekDays().map(day => (
-                  <div key={day.toISOString()} className="day-column">
-                    <div className="day-column-header">{day.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}</div>
-                    <div className="day-column-grid">
-                      {HOURS.map(h => <div key={h} className="grid-cell-line"></div>)}
-                      {renderTimeBlockedEvents(day)}
+                {getWeekDays().map(day => {
+                  const isToday = day.toDateString() === new Date().toDateString();
+                  return (
+                    <div key={`header-${day.toISOString()}`} className="day-column-header">
+                      <span className="weekday-label">
+                        {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </span>
+                      <span className={`date-number ${isToday ? 'is-today' : ''}`}>
+                        {day.getDate()}
+                      </span>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+
+              {/* SCROLLABLE GRID */}
+              <div className="time-grid-scroll-wrapper">
+                <div className="time-column">
+                  {HOURS.map(h => (
+                    <div key={h} className="hour-slot">
+                      <span className="hour-text">
+                        {h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="days-columns-container">
+                  {getWeekDays().map(day => (
+                    <div key={`grid-${day.toISOString()}`} className="day-column">
+                      <div className="day-column-grid">
+                        {HOURS.map(h => <div key={h} className="grid-cell-line"></div>)}
+                        {renderTimeBlockedEvents(day)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

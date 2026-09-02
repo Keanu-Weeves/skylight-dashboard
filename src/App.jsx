@@ -189,7 +189,7 @@ export default function App() {
           zIndex: 9999,
           width: '50px',
           height: '50px',
-          background: 'rgba(255, 255, 255, 0.1)',
+          background: 'rgba(126, 126, 126, 0.1)',
           backdropFilter: 'blur(10px)',
           color: '#fff',
           border: '1px solid rgba(255, 255, 255, 0.2)',

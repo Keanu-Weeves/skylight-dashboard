@@ -77,8 +77,8 @@
 
 .divider {
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.3); /* Softer divider */
-  width: 100%;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.3); /* Softer divider */
+  width: 65%;
   margin-bottom: 1rem;
 }
 
@@ -233,7 +233,7 @@
 
 .ticker-move {
   display: inline-block;
-  animation: ticker 25s linear infinite;
+  animation: ticker 30s linear infinite;
 }
 
 .ticker-item {

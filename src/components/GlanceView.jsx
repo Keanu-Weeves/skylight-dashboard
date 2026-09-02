@@ -71,13 +71,13 @@ export default function GlanceView({ currentTime, weatherData, activeLocation, h
                 upcomingEvents.slice(0, 4).map((evt, idx) => (
                   <div key={idx} className="event-row">
                     <span className="event-dot" style={{ backgroundColor: evt.userColor || 'rgba(255, 255, 255, 0.5)'}}></span>
-                    <span className="event-title">{evt.title}</span>
-                    <span className="event-date">{evt.date}</span>
+                    <span className="event-title" style={{ color: "white"}}>{evt.title}</span>
+                    <span className="event-date" style={{ color: "white"}}>{evt.date}</span>
                   </div>
                 ))
               ) : (
                 <div className="event-row" style={{ opacity: 0.6, fontStyle: 'italic', }}>
-                  <span className="event-title">Schedule clear</span>
+                  <span className="event-title" style={{ color: "white"}}>Schedule clear</span>
                 </div>
               )}
           </div>
