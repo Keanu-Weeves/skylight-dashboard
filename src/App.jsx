@@ -116,6 +116,12 @@ export default function App() {
     }
   };
 
+  const handleManualNavigate = (targetIndex) => {
+    if (targetIndex === currentIndex) return;
+    setDirection(targetIndex > currentIndex ? 1 : -1);
+    setCurrentIndex(targetIndex);
+  };
+
   const renderScreen = () => {
     if (screens[currentIndex] === 'tasks') return <TaskView hubData={hubData} hubMembers={hubMembers} />;
     if (screens[currentIndex] === 'glance') return (
@@ -126,6 +132,7 @@ export default function App() {
         hubData={hubData}
         hubMembers={hubMembers}
         upcomingEvents={upcomingEvents}
+        goToScreen={handleManualNavigate}
       />
     );
     if (screens[currentIndex] === 'grid') return (

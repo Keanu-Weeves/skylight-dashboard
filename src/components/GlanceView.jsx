@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './GlanceView.css';
 
-export default function GlanceView({ currentTime, weatherData, activeLocation, hubData, hubMembers, upcomingEvents = [] }) {
+export default function GlanceView({ currentTime, weatherData, activeLocation, hubData, hubMembers, upcomingEvents = [], goToScreen }) {
   const [newsItems, setNewsItems] = useState([]);
 
   const getDayPeriod = () => {
@@ -129,12 +129,21 @@ export default function GlanceView({ currentTime, weatherData, activeLocation, h
 
         {/* BOTTOM: Dots & Ticker */}
         <div className="region-bottom">
-          
-          {/* iOS Style Swipe Dots */}
-          <div className="pagination-dots">
-            <span className="dot"></span>
-            <span className="dot active"></span>
-            <span className="dot"></span>
+          <div className="navigation-controls" style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            marginBottom: "15px"
+          }}>
+              <button className="nav-arrow" onClick={() => goToScreen(0)}>◀ Tasks</button>
+            {/* iOS Style Swipe Dots */}
+            <div className="pagination-dots">
+              <span className="dot" onClick={() => goToScreen(0)} style={{ cursor: 'pointer' }}></span>
+              <span className="dot active"></span>
+              <span className="dot" onClick={() => goToScreen(2)} style={{ cursor: 'pointer' }}></span>
+            </div>
+
+            <button className="nav-arrow" onClick={() => goToScreen(2)}>Calendar ▶</button>
           </div>
 
           <div className="ticker-wrap">
