@@ -772,3 +772,12 @@
 .btn-danger:hover {
   background-color: #d87569;
 }
+
+/* Hide scrollbar for weather sliders but keep them swipeable */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

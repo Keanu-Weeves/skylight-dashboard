@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './GlanceView.css';
 
-export default function GlanceView({ currentTime, weatherData, activeLocation }) {
-
+export default function GlanceView({ currentTime, weatherData, activeLocation, hubData, hubMembers, upcomingEvents = [] }) {
+  const [newsItems, setNewsItems] = useState([]);
 
   const getDayPeriod = () => {
     const hour = currentTime.getHours();
@@ -12,8 +12,16 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
     return 'night';
   };
 
+  const period = getDayPeriod();
   const formattedTime = currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   const formattedDate = currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  // --- DYNAMIC DATABASE VARIABLES ---
+  const familyName = hubData?.family_name || 'Family';
+  const displayLocation = activeLocation || 'Location Pending';
+  
+  // Capitalize the first letter of the period for the greeting
+  const greetingPeriod = period.charAt(0).toUpperCase() + period.slice(1);
 
   const videoMap = {
     morning: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/morning-loop.mp4',
@@ -22,21 +30,18 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
     night: 'https://kbvxntidhoygnvuewaqx.supabase.co/storage/v1/object/public/background-videos/night-loop.mp4'
   };
 
-  const currentVideo = videoMap[getDayPeriod()];
+  const currentVideo = videoMap[period];
 
-  // Mock Data
-  const upcomingEvents = [
-    { title: "UoPeople", date: "Today", userColor: "#5eb3a6" },
-    { title: "Crashout", date: "Tomorrow", userColor: "#e58e82" },
-    { title: "Pickup from school", date: "Wed 5th", userColor: "#86efac" },
-    { title: "Work", date: "Thu 6th", userColor: "#a78bfa" }
-  ];
-
-  const weatherForecast = [
-    { day: 'Today', high: '74°', low: '62°', icon: '☀️' },
-    { day: 'Tomorrow', high: '68°', low: '58°', icon: '⛅' },
-    { day: 'Wed', high: '70°', low: '55°', icon: '🌧️' },
-  ];
+  useEffect(() => {
+    fetch('https://api.rss2json.com/v1/api.json?rss_url=https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml')
+    .then(res => res.json())
+    .then(data => {
+      if (data.items) {
+        setNewsItems(data.items.slice(0, 3));
+      }
+    })
+    .catch(err => console.error("Error fetching news:", err));
+  }, []);
 
   return (
     <div className="glance-container">
@@ -62,13 +67,19 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
           <div className="upcoming-list">
             <h3 className="list-header">UPCOMING</h3>
             <hr className="divider" />
-            {upcomingEvents.map((evt, idx) => (
-              <div key={idx} className="event-row">
-                <span className="event-dot" style={{ backgroundColor: evt.userColor }}></span>
-                <span className="event-title">{evt.title}</span>
-                <span className="event-date">{evt.date}</span>
-              </div>
-            ))}
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.slice(0, 4).map((evt, idx) => (
+                  <div key={idx} className="event-row">
+                    <span className="event-dot" style={{ backgroundColor: evt.userColor || 'rgba(255, 255, 255, 0.5)'}}></span>
+                    <span className="event-title">{evt.title}</span>
+                    <span className="event-date">{evt.date}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="event-row" style={{ opacity: 0.6, fontStyle: 'italic', }}>
+                  <span className="event-title">Schedule clear</span>
+                </div>
+              )}
           </div>
         </div>
 
@@ -81,27 +92,30 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
               <span className="cpu-dot"></span>
               <span className="wifi-icon">📶</span>
             </div>
-            <h3 className="location-text">HOME, NY</h3>
+            {/* Dynamic Location Injected Here */}
+            <h3 className="location-text">{displayLocation.toUpperCase()}</h3>
           </div>
           <hr className="divider right-align" />
           
           <div className="current-weather">
-            <span className="weather-icon-large">☀️</span>
+            {/* Dynamic Current Weather */}
+            <span className="weather-icon-large">{weatherData?.condition || '☀️'}</span>
             <div className="temp-block">
-              <span className="current-temp">72°</span>
-              <span className="feels-like">Feels like 74°</span>
+              <span className="current-temp">{weatherData?.temp || '--°'}</span>
+              <span className="feels-like">Feels like {weatherData?.feelsLike || '--°'}</span>
             </div>
           </div>
 
           <div className="forecast-list">
             <h3 className="list-header right-align">FORECAST</h3>
             <hr className="divider right-align" />
-            {weatherForecast.map((day, idx) => (
+            {/* Dynamically render the first 3 days of the forecast array */}
+            {(weatherData?.forecast?.slice(0, 3) || []).map((day, idx) => (
               <div key={idx} className="forecast-row">
-                <span className="forecast-day">{day.day}</span>
+                <span className="forecast-day">{idx === 0 ? 'Today' : day.day}</span>
                 <span className="forecast-icon">{day.icon}</span>
-                <span className="forecast-high">{day.high}</span>
-                <span className="forecast-low">{day.low}</span>
+                <span className="forecast-high">{day.max}</span>
+                <span className="forecast-low">{day.min}</span>
               </div>
             ))}
           </div>
@@ -109,7 +123,8 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
 
         {/* CENTER: Greeting */}
         <div className="region-center">
-          <h1 className="greeting-text">Hey Bootiful</h1>
+          {/* Dynamic Greeting Injected Here */}
+          <h1 className="greeting-text">Good {greetingPeriod}, {familyName} Family</h1>
         </div>
 
         {/* BOTTOM: Dots & Ticker */}
@@ -124,10 +139,15 @@ export default function GlanceView({ currentTime, weatherData, activeLocation })
 
           <div className="ticker-wrap">
             <div className="ticker-move">
-              <span className="ticker-item"><strong>New York Times</strong> | World War 3 is here!</span>
-              <span className="ticker-item warning-text">
-                <span className="pulse-icon">⚠️</span> <strong>FDA Alert</strong> | All food poisonous
-              </span>
+              {newsItems.length > 0 ? (
+                newsItems.map((item, idx) => (
+                  <span key={idx} className="ticker-item">
+                    <strong>New York Times</strong> | {item.title}
+                  </span>
+                ))
+              ) : (
+                <span className="ticker-item">Loading live news...</span>
+              )}
             </div>
           </div>
         </div>

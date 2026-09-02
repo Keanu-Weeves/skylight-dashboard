@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import { fetchUpcomingCalendarEvents } from './services/calendarService';
+import { fetchLocalWeather } from './services/weatherService'; // <--- WEATHER IMPORT ADDED
 import { motion, AnimatePresence } from 'framer-motion';
 import LoginScreen from './LoginScreen';
 import SettingsModal from './components/SettingsModal';
@@ -16,6 +18,9 @@ export default function App() {
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [hasHubSetup, setHasHubSetup] = useState(false);
   const [hubData, setHubData] = useState(null);
+  const [hubMembers, setHubMembers] = useState([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   // --- DASHBOARD NAVIGATION STATE ---
   const [currentIndex, setCurrentIndex] = useState(1);
@@ -23,17 +28,21 @@ export default function App() {
 
   // --- GLOBAL SHARED STATE ---
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [weatherData, setWeatherData] = useState({ temp: '72°', condition: '☀️', feelsLike: '74°' });
+  const [weatherData, setWeatherData] = useState(null);
 
   // Auth & Database Listener
   useEffect(() => {
     const checkHub = async (userId) => {
       // Fetch the user's specific hub settings
-      const { data } = await supabase.from('hubs').select('*').eq('owner_id', userId).single();
+      const { data: hub } = await supabase.from('hubs').select('*').eq('owner_id', userId).single();
       
-      if (data) {
+      if (hub) {
+        // If hub exists, fetch members
+        const { data: members } = await supabase.from('hub_members').select('*').eq('hub_id', hub.id);
+        
+        setHubData(hub);
+        setHubMembers(members || []);
         setHasHubSetup(true);
-        setHubData(data);
       } else {
         setHasHubSetup(false);
       }
@@ -62,6 +71,32 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  // Load events when session and hubMembers are ready
+  useEffect(() => {
+    async function loadEvents() {
+      if (session?.provider_token) {
+        const events = await fetchUpcomingCalendarEvents(session.provider_token, hubMembers);
+        setUpcomingEvents(events);
+      }
+    }
+    loadEvents();
+  }, [session, hubMembers]);
+
+  // --- FETCH LIVE WEATHER ---
+  useEffect(() => {
+    async function loadWeather() {
+      if (hubData?.weather_location) {
+        const liveWeather = await fetchLocalWeather(hubData.weather_location);
+        setWeatherData(liveWeather);
+      }
+    }
+    loadWeather();
+    
+    // Refresh weather every 30 minutes so it stays accurate
+    const weatherInterval = setInterval(loadWeather, 30 * 60 * 1000);
+    return () => clearInterval(weatherInterval);
+  }, [hubData?.weather_location]);
+
   // --- SWIPE ANIMATION LOGIC ---
   const slideVariants = {
     enter: (dir) => ({ x: dir > 0 ? 1000 : -1000, opacity: 0 }),
@@ -71,7 +106,7 @@ export default function App() {
 
   const handleDragEnd = (e, { offset, velocity }) => {
     const swipePower = Math.abs(offset.x) * velocity.x;
-    const swipeThreshold = 5000; 
+    const swipeThreshold = 5000;
     if (swipePower < -swipeThreshold && currentIndex < screens.length - 1) {
       setDirection(1);
       setCurrentIndex((prev) => prev + 1);
@@ -82,20 +117,25 @@ export default function App() {
   };
 
   const renderScreen = () => {
-    if (screens[currentIndex] === 'tasks') return <TaskView />;
+    if (screens[currentIndex] === 'tasks') return <TaskView hubData={hubData} hubMembers={hubMembers} />;
     if (screens[currentIndex] === 'glance') return (
-      <GlanceView 
-        currentTime={currentTime} 
-        weatherData={weatherData} 
-        // pull specific location from Supabase
-        activeLocation={hubData ? hubData.weather_location : 'Dawsonville, GA'} 
+      <GlanceView
+        currentTime={currentTime}
+        weatherData={weatherData}
+        activeLocation={hubData ? hubData.weather_location : 'Dawsonville, GA'}
+        hubData={hubData}
+        hubMembers={hubMembers}
+        upcomingEvents={upcomingEvents}
       />
     );
     if (screens[currentIndex] === 'grid') return (
-      <GridView 
-        currentTime={currentTime} 
-        weatherData={weatherData} 
-        onBackSwipe={() => { setDirection(-1); setCurrentIndex(1); }} 
+      <GridView
+        currentTime={currentTime}
+        weatherData={weatherData}
+        onBackSwipe={() => { setDirection(-1); setCurrentIndex(1); }}
+        hubData={hubData}
+        hubMembers={hubMembers}
+        session={session}
       />
     );
   };
@@ -131,25 +171,45 @@ export default function App() {
   // Logged in & Hub Setup, Render the swipeable hub
   return (
     <div className="app-container">
-      {/* Temporary Logout Button */}
+      
+      {/* Settings Gear in the Bottom Right */}
       <button
-        onClick={() => supabase.auth.signOut()}
+        onClick={() => setShowSettings(true)}
         style={{
           position: 'absolute',
-          top: '20px',
-          left: '20px',
+          bottom: '20px',
+          right: '20px',
           zIndex: 9999,
-          padding: '10px 20px',
+          width: '50px',
+          height: '50px',
           background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(10px)',
           color: '#fff',
           border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '12px',
+          borderRadius: '50%',
           cursor: 'pointer',
+          fontSize: '1.5rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        Sign Out
+        ⚙️
       </button>
+
+      {/* Render Settings Modal conditionally as an overlay */}
+      {showSettings && (
+        <SettingsModal 
+          session={session} 
+          isOnboarding={false} 
+          onClose={() => setShowSettings(false)} 
+          onComplete={() => {
+            setShowSettings(false);
+            // window reload to clean fetch new data and re-render UI
+            window.location.reload(); 
+          }} 
+        />
+      )}
 
       <AnimatePresence initial={false} custom={direction}>
         <motion.div

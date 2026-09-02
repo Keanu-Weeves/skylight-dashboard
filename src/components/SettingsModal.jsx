@@ -158,6 +158,28 @@ export default function SettingsModal({ session, isOnboarding, onClose, onComple
                 <button className="save-btn" onClick={handleSave} disabled={!familyName || saving}>
                     {saving ? 'Saving...' : (isOnboarding ? 'Launch Hub': 'Save Changes')}
                 </button>
+
+                {/* Only show the sign out button if user inside app */}
+                {!isOnboarding && (
+                    <button 
+                        onClick={() => supabase.auth.signOut()} 
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            background: 'transparent',
+                            color: '#ff4d4d',
+                            border: '1px solid rgba(255, 77, 77, 0.3)',
+                            borderRadius: '12px',
+                            fontWeight: 'bold',
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            marginTop: '1rem',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        Sign Out
+                    </button>
+                )}
             </div>
         </div>
     );
